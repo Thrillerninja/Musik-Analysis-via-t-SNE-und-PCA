@@ -1,0 +1,23 @@
+version: '3'
+services:
+  postgres:
+    image: ankane/pgvector:latest
+    container_name: pgvector_spotify
+    environment:
+      POSTGRES_DB: music_vectors_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    command: 
+      - "postgres"
+      - "-c"
+      - "max_connections=100"
+      - "-c"
+      - "shared_buffers=256MB"
+    restart: unless-stopped
+
+volumes:
+  pgdata:
