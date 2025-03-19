@@ -1,0 +1,114 @@
+%!TEX root = ../main.tex
+
+\chapter{Einleitung}
+
+\section{Hinführung zum Thema}
+In der heutigen datenlastigen Welt stehen wir immer häufiger vor der Herausforderung, hochdimensionale Daten zu analysieren und zu verstehen. Ein gutes Beispiel dafür ist der Bereich der Musikanalyse, in dem wir Datensätzen begegnen, die durch zahlreiche Merkmale wie Tanzbarkeit, Tempo, Lautstärke und viele weitere Attribute charakterisiert sind und darüber vorschläge erstellt werden. Diese multidimensionalen Merkmalsräume entziehen sich jedoch unserer direkten visuellen Wahrnehmung, die auf zwei oder maximal drei Dimensionen beschränkt ist.
+
+Dimensionalitätsreduktionsmethoden wie \ac{t-SNE} und \ac{PCA} bieten einen Ausweg aus diesem Dilemma. Sie ermöglichen es uns, die wesentlichen Strukturen und Muster hochdimensionaler Datensätze in einem niedrigdimensionalen Raum darzustellen, ohne dabei kritische Informationen zu verlieren. Diese Techniken haben sich als unverzichtbare Werkzeuge in der explorativen Datenanalyse etabliert und finden besonders in der Musikinformatik breite Anwendung.
+
+Die moderne Musikindustrie nutzt solche Techniken bereits intensiv für Empfehlungssysteme, Genreklassifikationen und die Entdeckung musikalischer Trends. Streaming-Dienste wie Spotify verwenden ähnliche Ansätze, um Benutzern personalisierte Playlists zu erstellen und neue Musik zu empfehlen, die ihren Vorlieben entspricht.
+
+\section{\acf{PCA}}
+
+Principal Component Analysis ist eine der ältesten und am häufigsten verwendeten Techniken zur Dimensionalitätsreduktion. Sie wurde bereits Anfang des 20. Jahrhunderts entwickelt und hat sich seither als Standard-Methode etabliert.
+
+\subsubsection{Mathematische Grundlage}
+
+PCA basiert auf einer linearen Transformation der Daten in ein neues Koordinatensystem, bei dem die Achsen (Hauptkomponenten) nach absteigender Varianz geordnet sind. Die erste Hauptkomponente erklärt den größten Teil der Varianz in den Daten, die zweite den zweitgrößten und so weiter.
+
+Mathematisch gesehen sucht PCA nach den Eigenvektoren der Kovarianzmatrix der Daten:
+
+\[
+\text{Cov}(X) = \frac{1}{n-1} \sum_{i=1}^{n} (x_i - \bar{x})(x_i - \bar{x})^T
+\]
+
+Die Eigenvektoren bilden die Hauptkomponenten, und die zugehörigen Eigenwerte geben an, wie viel Varianz durch jede Komponente erklärt wird.
+
+\subsubsection{Eigenschaften und Anwendung}
+
+PCA eignet sich besonders gut für Datensätze mit linearen Strukturen und wird oft als erster Schritt in einer Datenanalyse verwendet. Ihre Stärken liegen in der Einfachheit, Interpretierbarkeit und Skalierbarkeit:
+
+\begin{itemize}
+    \item \textbf{Einfachheit}: PCA ist konzeptionell leicht zu verstehen und effizient zu berechnen.
+    \item \textbf{Interpretierbarkeit}: Die Hauptkomponenten können oft semantisch interpretiert werden.
+    \item \textbf{Rauschreduktion}: Durch Fokussierung auf die Komponenten mit der größten Varianz wird Rauschen reduziert.
+    \item \textbf{Datenkompression}: PCA eignet sich hervorragend zur Datenkompression mit minimalem Informationsverlust.
+\end{itemize}
+
+Im Kontext der Musikdatenanalyse kann PCA helfen, Zusammenhänge zwischen verschiedenen Merkmalen wie Tempo, Lautstärke und Tanzbarkeit zu identifizieren und Musikstücke in einem zweidimensionalen Raum zu visualisieren.
+
+\section{t-Distributed Stochastic Neighbor Embedding (t-SNE)}
+
+t-SNE ist eine neuere, nichtlineare Dimensionalitätsreduktionstechnik, die 2008 von Laurens van der Maaten und Geoffrey Hinton entwickelt wurde. Im Gegensatz zu PCA konzentriert sich t-SNE darauf, die lokale Struktur der Daten zu bewahren, was sie besonders wertvoll für die Visualisierung macht.
+
+\subsection{Mathematischer Hintergrund}
+
+t-SNE arbeitet in zwei Hauptschritten:
+
+\begin{enumerate}
+    \item \textbf{Modellierung der Ähnlichkeiten im hochdimensionalen Raum}: t-SNE konstruiert eine Wahrscheinlichkeitsverteilung über Paare von Datenpunkten, sodass ähnliche Objekte eine hohe Wahrscheinlichkeit haben, als Nachbarn ausgewählt zu werden.
+    \item \textbf{Minimierung der Kullback-Leibler-Divergenz}: t-SNE erzeugt dann eine entsprechende Wahrscheinlichkeitsverteilung im niedrigdimensionalen Raum und versucht, die Kullback-Leibler-Divergenz zwischen den beiden Verteilungen zu minimieren:
+    \[
+    \text{KL}(P || Q) = \sum_{i \neq j} p_{ij} \log \frac{p_{ij}}{q_{ij}}
+    \]
+    Dabei verwendet t-SNE eine t-Verteilung im niedrigdimensionalen Raum, um das ``Crowding Problem'' zu mildern, das bei anderen Methoden auftreten kann.
+\end{enumerate}
+
+\subsection{Eigenschaften und Anwendung}
+
+t-SNE zeichnet sich durch folgende Eigenschaften aus:
+
+\begin{itemize}
+    \item \textbf{Bewahrt lokale Strukturen}: t-SNE ist besonders gut darin, lokale Nachbarschaftsbeziehungen zu erhalten.
+    \item \textbf{Gruppierungsfähigkeit}: t-SNE tendiert dazu, ähnliche Datenpunkte zu Clustern zusammenzufassen.
+    \item \textbf{Nichtlinearität}: Kann komplexe, nichtlineare Muster erfassen, die PCA möglicherweise verpasst.
+    \item \textbf{Perplexitätsparameter}: Erlaubt eine Feinabstimmung der Balance zwischen lokalen und globalen Aspekten der Daten.
+\end{itemize}
+
+In der Musikanalyse kann t-SNE verwendet werden, um Musikstücke basierend auf ihrer akustischen Ähnlichkeit zu visualisieren, was oft zu intuitiv verständlichen Clustern führt, die verschiedene Genres oder Stile repräsentieren.
+
+\section{Vektordatenbanken und pgvector}
+
+Die Verwaltung und Abfrage hochdimensionaler Vektordaten stellt besondere Anforderungen an Datenbanksysteme. Herkömmliche relationale Datenbanken sind nicht optimal für die effiziente Ähnlichkeitssuche in Vektorräumen konzipiert. Hier kommen spezialisierte Vektordatenbanken ins Spiel.
+
+\subsection{Was ist pgvector?}
+
+pgvector ist eine Erweiterung für das populäre PostgreSQL-Datenbanksystem, die es ermöglicht, Vektoren effizient zu speichern und Ähnlichkeitsabfragen durchzuführen. Es unterstützt verschiedene Distanzmetriken wie euklidische Distanz, Kosinus-Ähnlichkeit und Taxicab-Distanz.
+
+Die Hauptfunktionen von pgvector umfassen:
+
+\begin{itemize}
+    \item Speicherung von dichten Vektoren unterschiedlicher Dimension.
+    \item Effiziente Ähnlichkeitssuche mit verschiedenen Metriken.
+    \item Indizierungsmethoden für beschleunigte Abfragen.
+    \item Integration in das SQL-Ökosystem von PostgreSQL.
+\end{itemize}
+
+\subsection{Anwendung in der Musikanalyse}
+
+In der Musikanalyse kann pgvector genutzt werden, um:
+
+\begin{itemize}
+    \item Feature-Vektoren von Musikstücken zu speichern.
+    \item Ähnliche Songs basierend auf akustischen Merkmalen zu finden.
+    \item Effiziente Nachbarschaftsabfragen für Empfehlungssysteme durchzuführen.
+    \item Musikstücke nach bestimmten akustischen Eigenschaften zu filtern.
+\end{itemize}
+
+Die Kombination von pgvector mit Dimensionalitätsreduktionstechniken wie PCA und t-SNE bietet leistungsstarke Werkzeuge für die Analyse und Visualisierung von Musikdaten.
+
+% \section{Eigenschaften von Musikdaten}
+
+% Digitale Musikdaten können durch eine Vielzahl akustischer und musikalischer Merkmale charakterisiert werden. Diese Merkmale bilden die Grundlage für die Analyse, Kategorisierung und Visualisierung von Musik. Für unsere Untersuchung konzentrieren wir uns auf sechs Hauptmerkmale:
+
+% \begin{enumerate}
+%     \item \textbf{Tanzbarkeit} (0.0 bis 1.0): Beschreibt, wie geeignet ein Track zum Tanzen ist, basierend auf einer Kombination musikalischer Elemente wie Tempo, Rhythmusstabilität, Beat-Stärke und Regelmäßigkeit.
+%     \item \textbf{Lautstärke} (typischerweise -60dB bis 0dB): Die durchschnittliche Amplitude des Audiosignals, gibt Aufschluss über die wahrgenommene Lautheit eines Tracks.
+%     \item \textbf{Tempo} (BPM): Die Geschwindigkeit oder das Pace eines Tracks in Beats pro Minute. Typische Werte reichen von 50 BPM (langsame Balladen) bis über 200 BPM (schnelle elektronische Musik).
+%     \item \textbf{Energie} (0.0 bis 1.0): Ein Maß für die Intensität und Aktivität. Energetische Tracks fühlen sich schnell, laut und lärmig an.
+%     \item \textbf{Akustik} (0.0 bis 1.0): Die Wahrscheinlichkeit, dass ein Track akustisch ist (im Gegensatz zu elektronisch). Je höher der Wert, desto sicherer ist es, dass der Track akustische Instrumente verwendet.
+%     \item \textbf{Instrumentalität} (0.0 bis 1.0): Die Wahrscheinlichkeit, dass ein Track keine Gesangselemente enthält. Je näher der Wert an 1.0 liegt, desto größer ist die Wahrscheinlichkeit, dass der Track rein instrumental ist.
+% \end{enumerate}
+
+% Diese Merkmale bilden einen sechsdimensionalen Raum, in dem jedes Musikstück als Punkt dargestellt werden kann. Durch die Anwendung von Dimensionalitätsreduktions-Techniken können wir diese hochdimensionalen Daten in einem zweidimensionalen Raum visualisieren und so Muster und Beziehungen zwischen Musikstücken erkennen.
