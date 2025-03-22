@@ -1,10 +1,10 @@
-\section{Installation}
+\chapter{Installation}
 
-\subsection{Setup der PostgreSQL-Datenbank mit pgvector}
+\section{Setup der PostgreSQL-Datenbank mit pgvector}
 
 Für die Speicherung und Analyse von Musikdaten verwenden wir eine PostgreSQL-Datenbank mit der \texttt{pgvector}-Erweiterung. Diese ermöglicht die effiziente Speicherung und Abfrage hochdimensionaler Vektoren. Im Folgenden wird beschrieben, wie die Datenbank mit Docker eingerichtet wird.
 
-\subsubsection{Docker-Setup}
+\subsection{Docker-Setup}
 
 Wir verwenden Docker, um die PostgreSQL-Datenbank mit der \texttt{pgvector}-Erweiterung zu starten. Die Konfiguration erfolgt über die folgende \texttt{docker-compose.yml}-Datei:
 
@@ -28,7 +28,7 @@ Wir verwenden Docker, um die PostgreSQL-Datenbank mit der \texttt{pgvector}-Erwe
     \end{lstlisting}
 \end{enumerate}
 
-\subsubsection{Initialisierung der Datenbank}
+\subsection{Initialisierung der Datenbank}
 
 Nach dem Start der PostgreSQL-Datenbank muss die \texttt{pgvector}-Erweiterung aktiviert und die Datenbankstruktur eingerichtet werden. Dafür wurde dieses SQL Skript erstellt \texttt{init.sql}:
 
@@ -42,6 +42,6 @@ Dieses Skript erstellt eine Tabelle \texttt{music\_vectors} mit einer Spalte \te
 
 Speichern Sie die obige SQL-Datei als \texttt{init.sql}, die Ausführung wird durch das Hautprogramm, dem angehängten \texttt{jupyter notebook}, durchgeführt.
 
-\subsection{Herunterladen der genutzten Musikdaten}
+\section{Herunterladen der genutzten Musikdaten}
 
 Die Musikdaten, die in diesem Projekt verwendet werden, sind in der \texttt{spotify\_dataset.csv}-Datei enthalten, welche von \href{https://www.kaggle.com/datasets/bricevergnou/spotify-recommendation}{Kaggle} heruntergeladen wurde. Diese Datei enthält Eigenschaften von verschiedenen Musikstücken, die Informationen wie die Lautstärke, die Energie, die Tanzbarkeit und die Dauer enthalten.

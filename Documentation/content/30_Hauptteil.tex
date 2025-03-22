@@ -1,0 +1,168 @@
+\chapter{Umsetzung und Analyse}
+
+In diesem Kapitel werden die Schritte zur Datenvorbereitung, Dimensionalitätsreduktion und Visualisierung der Musikdaten beschrieben.
+
+\section{Datenvorbereitung}
+
+Bevor wir mit der Dimensionalitätsreduktion beginnen, laden wir die Daten zuerst in die Datenbank.
+
+\subsection*{Normalisierung der Daten}
+Da die einzelenen Merkmale der Musikdaten in unterschiedlichen Skalen vorliegen, ist es notwendig, die Daten zu normalisieren. Dafür wurder der \texttt{Standerd\_Scalar} der \texttt{sklearn} lib verwendet.
+
+\subsection*{Datenimport in die Datenbank}
+Die erste Zelle des Jupyter Notebooks zeigt, wie die Daten in die PostgreSQL-Datenbank importiert werden. Dazu wird die \texttt{music\_vectors}-Tabelle erstellt und die Daten aus der \texttt{spotify\_dataset.csv}-Datei importiert. Diese werden dann zur weiteren Verarbeitung und Organisation mit einer Transaktion in die Datenbank eingefügt.
+
+\begin{lstlisting}[language=python, caption={Insert der Musikdaten in die Datenbank}]
+conn = connect_to_postgres()
+execute_values(
+    cursor,
+    "INSERT INTO music_vectors (features) VALUES %s",
+    data_to_insert,
+    template="(%s)"
+)
+conn.commit()
+\end{lstlisting}
+
+
+
+
+\section{Dimensionalitätsreduktion mit PCA}
+
+Die Principal Component Analysis (PCA) wird verwendet, um die Dimensionen der Daten zu reduzieren und die Hauptvariationsrichtungen zu identifizieren.
+
+\subsection{Anwendung von PCA}
+
+Das folgende Python-Skript zeigt, wie PCA auf die normalisierten Daten angewendet wird:
+
+\begin{lstlisting}[language=python, caption={PCA-Analyse der Musikdaten}]
+from sklearn.decomposition import PCA
+# Perform PCA
+pca = PCA(n_components=2)
+pca_result = pca.fit_transform(features_standardized)
+\end{lstlisting}
+Dabei ergibt sich die \texttt{pca\_result} als zweidimensionales Array, das die reduzierten Daten enthält. Bei dem genutzten Beispieldatensatz ergibt sich eine Varianz von 31\% für die erste und 13\% für die zweite Hauptkomponente. Damit konnten rund 45\% der Varianz im vorliegenden Datensatz abgedeckt werden.
+
+Dies zeigt sich in der Visualisierung der Dimensionsreduktion in der eindeutig zwei größtenteils getrennte Cluster zu erkennen sind.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{resources/images/pca_visualization.png}
+    \caption{PCA der Musikdaten}
+\end{figure}
+
+Ohne die Einfärbung wäre die unterteilung in Cluster jedoch nicht so eindeutig zu erkennen. Woran dies liegt lässt sich durch die Betrachtung welche Faktoren die Hauptkomponenten beeinflussen erkennen.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{resources/images/pca_loadings.png}
+    \caption{Erklärte Varianz der Hauptkomponenten}
+\end{figure}
+Bei den Features mit einem Ausschlag beider Hauptkomponenen in die selbe Richtung
+
+\subsection{Interpretation der PCA-Ergebnisse}
+
+Die PCA-Visualisierung zeigt die Hauptvariationsrichtungen der Musikdaten. Jeder Punkt repräsentiert ein Musikstück im zweidimensionalen PCA-Raum. Die erklärten Varianzanteile der ersten beiden Hauptkomponenten geben an, wie viel Information aus den ursprünglichen Daten in der reduzierten Darstellung erhalten bleibt.
+
+\section{Dimensionalitätsreduktion mit t-SNE}
+
+t-SNE ist eine nichtlineare Dimensionalitätsreduktionstechnik, die besonders gut geeignet ist, lokale Strukturen in den Daten zu bewahren.
+
+\subsection{Anwendung von t-SNE}
+
+Das folgende Python-Skript zeigt, wie t-SNE auf die normalisierten Daten angewendet wird:
+
+\begin{lstlisting}[language=python, caption={t-SNE-Analyse der Musikdaten}]
+from sklearn.manifold import TSNE
+import time
+
+# t-SNE anwenden
+start_time = time.time()
+tsne = TSNE(n_components=2, perplexity=30, learning_rate=200, n_iter=1000, random_state=42)
+features_tsne = tsne.fit_transform(features_normalized)
+end_time = time.time()
+
+print(f"t-SNE Berechnungszeit: {end_time - start_time:.2f} Sekunden")
+
+# Visualisierung
+plt.figure(figsize=(10, 8))
+plt.scatter(features_tsne[:, 0], features_tsne[:, 1], alpha=0.5)
+plt.title('t-SNE der Musikdaten')
+plt.xlabel('Dimension 1')
+plt.ylabel('Dimension 2')
+plt.grid(True, linestyle='--', alpha=0.7)
+plt.tight_layout()
+plt.savefig('tsne_visualization.png', dpi=300)
+plt.show()
+\end{lstlisting}
+
+\subsection{Interpretation der t-SNE-Ergebnisse}
+
+Die t-SNE-Visualisierung zeigt Cluster von Musikstücken, die basierend auf ihren Merkmalen ähnlich sind. Diese Cluster können Genres, Stimmungen oder andere musikalische Eigenschaften repräsentieren.
+
+\section{Vergleich von PCA und t-SNE}
+
+PCA und t-SNE bieten unterschiedliche Perspektiven auf die Daten. Während PCA die globale Struktur bewahrt und lineare Beziehungen betont, fokussiert t-SNE auf lokale Ähnlichkeiten und bildet Cluster.
+
+\begin{lstlisting}[language=python, caption={Vergleich von PCA und t-SNE}]
+plt.figure(figsize=(18, 8))
+
+# PCA-Plot
+plt.subplot(1, 2, 1)
+plt.scatter(features_pca[:, 0], features_pca[:, 1], alpha=0.5)
+plt.title('PCA')
+plt.xlabel(f'Hauptkomponente 1 ({explained_variance[0] * 100:.2f}%)')
+plt.ylabel(f'Hauptkomponente 2 ({explained_variance[1] * 100:.2f}%)')
+plt.grid(True, linestyle='--', alpha=0.7)
+
+# t-SNE-Plot
+plt.subplot(1, 2, 2)
+plt.scatter(features_tsne[:, 0], features_tsne[:, 1], alpha=0.5)
+plt.title('t-SNE')
+plt.xlabel('Dimension 1')
+plt.ylabel('Dimension 2')
+plt.grid(True, linestyle='--', alpha=0.7)
+
+plt.tight_layout()
+plt.savefig('pca_vs_tsne.png', dpi=300)
+plt.show()
+\end{lstlisting}
+
+\subsection{Ergebnisse des Vergleichs}
+
+\begin{itemize}
+    \item \textbf{PCA}: Bewahrt die globale Struktur der Daten und zeigt Trends entlang der Hauptrichtungen der Varianz.
+    \item \textbf{t-SNE}: Betont lokale Ähnlichkeiten und bildet Cluster, die oft intuitiv verständlich sind.
+\end{itemize}
+
+\section{Hervorhebung spezifischer Musikstücke}
+
+Die Visualisierungen können erweitert werden, um bestimmte Musikstücke oder Gruppen hervorzuheben, z. B. basierend auf Genres oder Künstlern. Dies kann durch farbliche Markierungen oder spezielle Symbole erfolgen.
+
+\begin{lstlisting}[language=python, caption={Hervorhebung spezifischer Musikstücke}]
+# Beispiel: Hervorhebung eines Genres
+genre_labels = data['genre'] if 'genre' in data.columns else None
+unique_genres = genre_labels.unique() if genre_labels is not None else []
+
+plt.figure(figsize=(12, 10))
+
+# Hintergrund: Alle Songs
+plt.scatter(features_tsne[:, 0], features_tsne[:, 1], c='lightgrey', alpha=0.3, label='Andere')
+
+# Hervorhebung spezifischer Genres
+for genre in unique_genres:
+    indices = genre_labels == genre
+    plt.scatter(features_tsne[indices, 0], features_tsne[indices, 1], label=genre, alpha=0.7)
+
+plt.title('t-SNE der Musikdaten nach Genre')
+plt.xlabel('Dimension 1')
+plt.ylabel('Dimension 2')
+plt.legend()
+plt.grid(True, linestyle='--', alpha=0.7)
+plt.tight_layout()
+plt.savefig('tsne_by_genre.png', dpi=300)
+plt.show()
+\end{lstlisting}
+
+\subsection{Ergebnisse der Hervorhebung}
+
+Die hervorgehobenen Cluster in der t-SNE-Visualisierung zeigen, wie sich verschiedene Genres oder Künstler in den Daten unterscheiden. Dies kann für die Entwicklung von Empfehlungssystemen oder die Analyse von Musiktrends genutzt werden.
+
+\end{document}

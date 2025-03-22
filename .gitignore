@@ -13,6 +13,8 @@
 *.bbl
 *.blg
 *.fls
+.dvi
+.out.ps
 *.fdb_latexmk
 *.synctex.gz
 main.blg
