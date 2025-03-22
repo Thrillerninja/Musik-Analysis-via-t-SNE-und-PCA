@@ -1,0 +1,82 @@
+\section{Vergleich von PCA und t-SNE}
+
+Nach der Anwendung beider Dimensionsreduktionstechniken auf unseren Musikdatensatz können wir nun einen fundierten Vergleich zwischen PCA und t-SNE ziehen, sowohl aus theoretischer als auch aus praktischer Sicht.
+
+\textbf{Unterschiede in der Methodik}
+
+Die grundlegenden methodischen Unterschiede zwischen PCA und t-SNE spiegeln sich deutlich in den Ergebnissen wider:
+
+- \textbf{PCA} ist ein lineares Verfahren, das auf die Maximierung der Varianz abzielt. Es identifiziert Richtungen im Datenraum, in denen die Daten am stärksten variieren, und projiziert die Daten auf diese Hauptkomponenten. In unserem Fall konnten durch die ersten beiden Hauptkomponenten etwa 45\% der Gesamtvarianz erklärt werden.
+
+- \textbf{t-SNE} hingegen ist ein nichtlineares Verfahren, das lokale Strukturen und Nachbarschaftsbeziehungen in den Daten bewahrt. Es modelliert die Ähnlichkeiten zwischen Datenpunkten und versucht, diese im niedrigdimensionalen Raum zu erhalten. Die Perplexität ist dabei ein kritischer Parameter, der die Anzahl der berücksichtigten Nachbarn steuert.
+
+\textbf{Visuelle Interpretation der Ergebnisse}
+
+Die Visualisierungen zeigen deutliche Unterschiede:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{resources/images/pca_vs_tsne.png}
+    \caption{Vergleich der Dimensionsreduktionsmethoden}
+\end{figure}
+
+Bei der \textbf{PCA-Visualisierung} sehen wir:
+\begin{itemize}
+    \item Eine graduelle Trennung der Musikgenres, jedoch mit Überlappungen
+    \item Die Datenpunkte folgen einer linearen Struktur, die durch die Hauptkomponenten vorgegeben wird
+    \item Die Interpretierbarkeit der Achsen ist durch die Loadings gegeben – wir können erkennen, dass PC1 stark mit Instrumentalität und Akustik korreliert, während PC2 mit Energie und Lautstärke zusammenhängt
+\end{itemize}
+
+Bei der \textbf{t-SNE-Visualisierung} mit optimaler Perplexität (30) zeigt sich:
+\begin{itemize}
+    \item Eine deutlichere Clusterbildung der Musikgenres
+    \item Stärkere lokale Strukturen, die in der PCA nicht sichtbar sind
+    \item Keine direkte Interpretierbarkeit der Achsen, da t-SNE keine direkten linearen Transformationen der ursprünglichen Features darstellt
+\end{itemize}
+
+\section{Anwendungsszenarien der Verfahren}
+
+Basierend auf unserer Analyse eignen sich die beiden Methoden für unterschiedliche Szenarien:
+
+\textbf{PCA ist vorzuziehen, wenn:}
+\begin{itemize}
+    \item Die interpretierbare Darstellung der Dimensionen wichtig ist
+    \item Der Fokus auf der Erhaltung der globalen Datenstruktur liegt
+    \item Eine schnelle Berechnung erforderlich ist (PCA ist deutlich weniger rechenintensiv)
+    \item Die Daten auf lineare Beziehungen untersucht werden sollen
+    \item Neue Datenpunkte einfach in den reduzierten Raum projiziert werden müssen, ohne die gesamte Transformation neu zu berechnen
+\end{itemize}
+
+\textbf{t-SNE ist vorzuziehen, wenn:}
+\begin{itemize}
+    \item Die Visualisierung und Entdeckung von Clustern im Vordergrund steht
+    \item Lokale Strukturen und nichtlineare Beziehungen erhalten werden sollen
+    \item Die Interpretierbarkeit der Dimensionen weniger wichtig ist als die Qualität der Visualisierung
+    \item Ausreichend Rechenkapazität für die iterative Optimierung zur Verfügung steht
+\end{itemize}
+
+\textbf{Auswirkungen auf das Musikempfehlungssystem}
+
+Für ein Musikempfehlungssystem haben beide Methoden Vor- und Nachteile:
+
+1. \textbf{Mit PCA} könnten wir ein interpretierbares Modell erstellen, das beispielsweise erklären kann, warum bestimmte Songs empfohlen werden (z.B. "dieser Song hat ähnliche akustische Eigenschaften wie die, die Sie mögen"). Die lineare Transformation ermöglicht zudem eine effiziente Integration neuer Songs in das bestehende System.
+
+2. \textbf{Mit t-SNE} könnten wir feinere Unterschiede zwischen Musikstücken erfassen und besser abgegrenzte Genre-Cluster identifizieren. Dies könnte zu präziseren Empfehlungen führen, insbesondere für Nutzer mit spezifischen Musikvorlieben.
+
+Eine optimale Lösung könnte die Kombination beider Methoden sein: PCA zur initialen Dimensionsreduktion und Entfernung von Rauschen in den Daten, gefolgt von t-SNE zur Feinabstimmung der Visualisierung und Clusteridentifikation.
+
+\textbf{Effizienz und Skalierbarkeit}
+
+Ein wichtiger praktischer Aspekt ist die Effizienz und Skalierbarkeit der Methoden:
+
+- \textbf{PCA} hat eine Zeitkomplexität von \(O(\min(n^2p, np^2))\), wobei \(n\) die Anzahl der Datenpunkte und \(p\) die Anzahl der Dimensionen ist. In unserem Fall mit etwa 200 Songs und weniger als 20 Features ist die Berechnung in Sekundenbruchteilen abgeschlossen.
+
+- \textbf{t-SNE} hat eine deutlich höhere Zeitkomplexität von \(O(n^2)\) und benötigt in unserem Fall bereits auf dem keinen Datensatz mit 1000 Iterationen mehrere Sekunden zur Berechnung.
+
+Für ein praktisches Musikempfehlungssystem mit Millionen von Songs wäre PCA daher möglicherweise die effizientere Wahl für die Echtzeit-Verarbeitung, während t-SNE für Offline-Analysen und tiefere Einblicke in die Datenstruktur verwendet werden könnte.
+
+\textbf{Fazit}
+
+Die Wahl zwischen PCA und t-SNE hängt stark vom spezifischen Anwendungsfall und den Prioritäten des Projekts ab. Für ein Musikempfehlungssystem ergibt sich aus der Analyse, dass PCA durch seine Interpretierbarkeit und Effizienz Vorteile für die Basis-Infrastruktur bietet, während t-SNE wertvolle Einblicke für die Feinabstimmung und Visualisierung liefern kann.
+
+In der praktischen Umsetzung könnte ein hybrider Ansatz, der die Stärken beider Methoden kombiniert, die vielversprechendste Lösung darstellen, um sowohl effiziente als auch hochwertige Musikempfehlungen zu generieren.

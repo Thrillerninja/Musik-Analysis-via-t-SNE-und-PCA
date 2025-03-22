@@ -2,11 +2,11 @@
 
 \section{Setup der PostgreSQL-Datenbank mit pgvector}
 
-Für die Speicherung und Analyse von Musikdaten verwenden wir eine PostgreSQL-Datenbank mit der \texttt{pgvector}-Erweiterung. Diese ermöglicht die effiziente Speicherung und Abfrage hochdimensionaler Vektoren. Im Folgenden wird beschrieben, wie die Datenbank mit Docker eingerichtet wird.
+Für die Speicherung und Analyse von Musikdaten verwenden wir eine PostgreSQL-Datenbank mit der \texttt{pgvector}-Erweiterung\cite{pgvector}. Diese ermöglicht die effiziente Speicherung und Abfrage hochdimensionaler Vektoren. Im Folgenden wird beschrieben, wie die Datenbank mit Docker eingerichtet wird.
 
 \subsection{Docker-Setup}
 
-Wir verwenden Docker, um die PostgreSQL-Datenbank mit der \texttt{pgvector}-Erweiterung zu starten. Die Konfiguration erfolgt über die folgende \texttt{docker-compose.yml}-Datei:
+Wir verwenden Docker\cite{docker}, um die PostgreSQL-Datenbank mit der \texttt{pgvector}-Erweiterung zu starten. Die Konfiguration erfolgt über die folgende \texttt{docker-compose.yml}-Datei:
 
 \lstinputlisting[
   language=yaml, 
@@ -30,18 +30,40 @@ Wir verwenden Docker, um die PostgreSQL-Datenbank mit der \texttt{pgvector}-Erwe
 
 \subsection{Initialisierung der Datenbank}
 
-Nach dem Start der PostgreSQL-Datenbank muss die \texttt{pgvector}-Erweiterung aktiviert und die Datenbankstruktur eingerichtet werden. Dafür wurde dieses SQL Skript erstellt \texttt{init.sql}:
+Nach dem Start der PostgreSQL-Datenbank muss die \texttt{pgvector}-Erweiterung\cite{pgvector} aktiviert, die Datenbanktabelle und ein Index auf dieser zur beschleunigung von Anfragen eingerichtet werden. Dafür wird das \texttt{init.sql} Skript verwendet:
 
 \lstinputlisting[
     language=sql, 
-    caption={Setup int.sql Datei}, 
+    caption={Ausschnitt aus init.sql}, 
     basicstyle=\small\ttfamily, 
+    firstline=7
 ]{../init.sql}
 
-Dieses Skript erstellt eine Tabelle \texttt{music\_vectors} mit einer Spalte \texttt{vector} vom Typ \texttt{vector}. Die \texttt{pgvector}-Erweiterung wird aktiviert und die Tabelle wird mit einem IVFFLAT-Index für die Vektorspalte erstellt. 
+Dieses Skript erstellt eine Tabelle \texttt{music\_vectors} mit einer Spalte \texttt{vector} mit einer Kapazität von 14 Dimensionalen Vektoren, der Anzahl Merkmale im Datensatz. Um spätere abfragen zu beschleunigen erstellen wir außerdem einen IVFFLAT-Index um die Ähnlichkeitssuche zu beschleunigen.
 
-Speichern Sie die obige SQL-Datei als \texttt{init.sql}, die Ausführung wird durch das Hautprogramm, dem angehängten \texttt{jupyter notebook}, durchgeführt.
+Speichern Sie die angehängte Vollversion der SQL-Datei als \texttt{init.sql}, die Ausführung wird durch das Hautprogramm, dem angehängten \texttt{jupyter notebook}, durchgeführt.
 
 \section{Herunterladen der genutzten Musikdaten}
 
 Die Musikdaten, die in diesem Projekt verwendet werden, sind in der \texttt{spotify\_dataset.csv}-Datei enthalten, welche von \href{https://www.kaggle.com/datasets/bricevergnou/spotify-recommendation}{Kaggle} heruntergeladen wurde. Diese Datei enthält Eigenschaften von verschiedenen Musikstücken, die Informationen wie die Lautstärke, die Energie, die Tanzbarkeit und die Dauer enthalten.
+
+\section{Installation der Python-Bibliotheken}
+
+Eine python Installation ist notwendig um die Daten zu verarbeiten und die Analyse durchzuführen. Die benötigten Bibliotheken sind in der \texttt{requirements.txt}-Datei aufgelistet und können mit dem folgenden Befehl installiert werden:
+
+\begin{lstlisting}[language=bash]
+pip install -r requirements.txt
+\end{lstlisting}
+
+\section{Ergebnis der Installation}
+Nachdem diese Schritte abgeschlossen sind, sollte das Dateisystem wie folgt aussehen:
+
+\begin{lstlisting}[caption={Dateisystem nach Installation}]
+D:.
+  |
+  +-- compose.yml
+  +-- init.sql
+  +-- requirements.txt
+  +-- spotify_dataset.csv
+  +-- Visualization.ipynb
+\end{lstlisting}

@@ -5,8 +5,8 @@
     paper=a4,           % DIN A4
     12pt,               % Schriftgröße 12
     parskip=full,       % eine Zeile Absatzabstand
-    oneside             % einseitig
-    listof=totoc,		% alle Verzeichnisse in ToC einbinden
+    % oneside,          % einseitig (removed)
+    % listof=totoc,     % alle Verzeichnisse in ToC einbinden (removed)
     bibliography=totoc,
     toc=listof,
     toc=chapterentrydotfill % ToC Punkte
@@ -149,6 +149,8 @@
     tabsize=2,
 }
 
+\setlength{\headheight}{50.92297pt} % Increase headheight
+\addtolength{\topmargin}{-32.79797pt} % Adjust topmargin
 
 \newcommand\YAMLcolonstyle{\color{red}\mdseries}
 \newcommand\YAMLkeystyle{\color{black}\bfseries}
